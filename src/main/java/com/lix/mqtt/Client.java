@@ -58,7 +58,20 @@ public class Client {
             // 设置会话心跳时间 单位为秒 服务器会每隔1.5*20秒的时间向客户端发送个消息判断客户端是否在线，但这个方法并没有重连的机制
             options.setKeepAliveInterval(20);
             // 设置回调
-            client.setCallback(new PushCallback("test"));
+//            client.setCallback(new PushCallback("test"));
+            client.setCallback(new MqttCallback() {
+                public void connectionLost(Throwable throwable) {
+
+                }
+
+                public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
+                    System.out.println("aaaaaa");
+                }
+
+                public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+                    System.out.println("bbbbb");
+                }
+            });
             MqttTopic topic = client.getTopic(TOPIC);
             //setWill方法，如果项目中需要知道客户端是否掉线可以调用该方法。设置最终端口的通知消息
             options.setWill(topic, "close".getBytes(), 0, true);
@@ -83,12 +96,12 @@ public class Client {
 
 
     public static void main(String[] args) throws MqttException {
-        Client client = new Client("1234");
-        client.dostart();
+//        Client client = new Client("1234");
+//        client.dostart();
         Client client1 = new Client("1235");
         client1.dostart();
-        Client client2 = new Client("1236");
-        client2.dostart();
+//        Client client2 = new Client("1236");
+//        client2.dostart();
     }
 
     public void dostart(){

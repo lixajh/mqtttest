@@ -89,10 +89,10 @@ public class MqttTest {
 
     public static void main(String[] args) throws MqttException {
 //        publish("message content","1234","$share/edge/server/public/a");
-        MqttTest mqttTest = new MqttTest("1234");
-        mqttTest.doConnect();
-//        MqttTest mqttTest1 = new MqttTest("1235");
-//        mqttTest1.doConnect();
+//        MqttTest mqttTest = new MqttTest("1234");
+//        mqttTest.doConnect();
+        MqttTest mqttTest1 = new MqttTest("1235");
+        mqttTest1.doConnect();
 //        MqttTest mqttTest2 = new MqttTest("1236");
 //        mqttTest2.doConnect();
         try {
