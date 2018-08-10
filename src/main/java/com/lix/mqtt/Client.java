@@ -32,7 +32,13 @@ public class Client {
             public void run() {
                 if (!client.isConnected()) {
                     try {
+                        System.out.println("重新连接："+client.getClientId());
                         client.connect(options);
+
+                        int[] Qos = {0};
+                        String[] topic1 = {TOPIC};
+                        client.subscribe(topic1, Qos);
+
                     } catch (MqttSecurityException e) {
                         e.printStackTrace();
                     } catch (MqttException e) {
@@ -64,7 +70,8 @@ public class Client {
 //            client.setCallback(new PushCallback("test"));
             client.setCallback(new MqttCallback() {
                 public void connectionLost(Throwable throwable) {
-
+                    System.out.println("connectionLost:" + throwable.getMessage());
+                        startReconnect();
                 }
 
                 public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
@@ -85,8 +92,14 @@ public class Client {
             String[] topic1 = {TOPIC};
             client.subscribe(topic1, Qos);
         } catch (Exception e) {
+            System.out.println("94");
             e.printStackTrace();
+
         }
+    }
+
+    public void reconnect(){
+
     }
 
     public void disconnect() {
@@ -120,7 +133,6 @@ public class Client {
     public void dostart(){
         new Thread(new Runnable() {
             public void run() {
-
                 start();
             }
         }).start();
