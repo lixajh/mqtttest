@@ -4,6 +4,8 @@ package com.lix.mqtt;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.sql.SQLException;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -65,7 +67,7 @@ public class Client {
                 }
 
                 public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
-                    System.out.println("aaaaaa");
+                    System.out.println("aaaaaa" + clientid);
                 }
 
                 public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
@@ -95,11 +97,21 @@ public class Client {
     }
 
 
-    public static void main(String[] args) throws MqttException {
+    public static void main(String[] args) throws MqttException, SQLException {
 //        Client client = new Client("1234");
 //        client.dostart();
-        Client client1 = new Client("1235");
-        client1.dostart();
+        PersonDao personDao = new PersonDaoImpl();
+        List<Device> all = personDao.findAll();
+        for (Device d : all){
+            if ("test".equals(d.getUsername())){
+                Client client1 = new Client(d.getClientid());
+                client1.dostart();
+            }
+        }
+
+
+//        Client client1 = new Client("1235");
+//        client1.dostart();
 //        Client client2 = new Client("1236");
 //        client2.dostart();
     }
