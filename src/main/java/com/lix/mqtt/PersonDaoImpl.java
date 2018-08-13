@@ -61,7 +61,7 @@ public class PersonDaoImpl implements PersonDao {
     @Override
     public List<Device> findAll() throws SQLException {
         Connection connection = DBUtils.getConnection();
-        String sql = "select username,id,clientid from mqtt_acl order by id limit 507 ";
+        String sql = "select username,id,clientid from mqtt_acl order by id limit 10007 ";
         List<Device> devices = runner.query(connection, sql, new BeanListHandler<Device>(Device.class));
         DBUtils.close(null,null,connection);
         return devices;

@@ -14,6 +14,7 @@ public class Client {
 
     public static final String HOST = "tcp://118.24.155.154:1883";
     public static final String TOPIC = "tokudu/yzq124";
+    public static final String TOPIC_CLIENTID = "tokudu/clientid/";
     private String clientid = "1234";
     private MqttClient client;
     private MqttConnectOptions options;
@@ -22,9 +23,10 @@ public class Client {
 
     private ScheduledExecutorService scheduler;
 
-    Client(String clientId){
+    Client(String clientId) {
         this.clientid = clientId;
     }
+
     //重新链接
     public void startReconnect() {
         scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -32,11 +34,11 @@ public class Client {
             public void run() {
                 if (!client.isConnected()) {
                     try {
-                        System.out.println("重新连接："+client.getClientId());
+                        System.out.println("重新连接：" + client.getClientId());
                         client.connect(options);
 
-                        int[] Qos = {0};
-                        String[] topic1 = {TOPIC};
+                        int[] Qos = {0,0};
+                        String[] topic1 = {TOPIC, TOPIC_CLIENTID + clientid};
                         client.subscribe(topic1, Qos);
 
                     } catch (MqttSecurityException e) {
@@ -46,7 +48,7 @@ public class Client {
                     }
                 }
             }
-        }, 0 * 1000, 10 * 1000, TimeUnit.MILLISECONDS);
+        }, 0 * 1000, 30 * 1000, TimeUnit.MILLISECONDS);
     }
 
     private void start() {
@@ -71,7 +73,7 @@ public class Client {
             client.setCallback(new MqttCallback() {
                 public void connectionLost(Throwable throwable) {
                     System.out.println("connectionLost:" + throwable.getMessage());
-                        startReconnect();
+                    startReconnect();
                 }
 
                 public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
@@ -88,17 +90,18 @@ public class Client {
 
             client.connect(options);
             //订阅消息
-            int[] Qos = {0};
-            String[] topic1 = {TOPIC};
+            int[] Qos = {0,0};
+            String[] topic1 = {TOPIC, TOPIC_CLIENTID + clientid};
+//            String[] topic1 = {TOPIC};
             client.subscribe(topic1, Qos);
         } catch (Exception e) {
             System.out.println("94");
             e.printStackTrace();
-
+            startReconnect();
         }
     }
 
-    public void reconnect(){
+    public void reconnect() {
 
     }
 
@@ -111,15 +114,21 @@ public class Client {
     }
 
 
-    public static void main(String[] args) throws MqttException, SQLException {
+    public static void main(String[] args) throws MqttException, SQLException, InterruptedException {
 //        Client client = new Client("1234");
 //        client.dostart();
         PersonDao personDao = new PersonDaoImpl();
         List<Device> all = personDao.findAll();
-        for (Device d : all){
-            if ("test".equals(d.getUsername())){
+        int i=0;
+        for (Device d : all) {
+            if ("test".equals(d.getUsername())) {
                 Client client1 = new Client(d.getClientid());
                 client1.dostart();
+                i++;
+                if (i>1000){
+                    Thread.sleep(1000);
+                    i = 0;
+                }
             }
         }
 
@@ -130,7 +139,7 @@ public class Client {
 //        client2.dostart();
     }
 
-    public void dostart(){
+    public void dostart() {
         new Thread(new Runnable() {
             public void run() {
                 start();
